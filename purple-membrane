@@ -1,9 +1,10 @@
-PLAN101
-
+/- 
 THE HOMOTOPICAL SURROGATE 
   A space is not a flat set `Set α`. It is a continuous, vibrating membrane 
   modelled as a simplicial set. It ascends in degrees: points, paths, homotopies.
 -/
+namespace TheVibratingSpace
+
 abbrev VibratingSpace := sSet.{u}
 
 /-- 
@@ -14,7 +15,7 @@ abbrev VibratingSpace := sSet.{u}
 -/
 class SmoothDeformation (X : VibratingSpace) : Prop where
   is_kan : Nonempty (KanComplex X)
-purple
+
 /-- 
   In this universe, two points `x` and `y` are not strictly "equal". 
   They are connected by a 1-simplex (a path).
