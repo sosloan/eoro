@@ -1,19 +1,28 @@
 use crate::{Trajectory, Vector3};
 
-/// A single stop along a planned route.
+/// Village role: a waystation on the village road network — records the
+/// precise map position of a stop and the time at which a traveller is
+/// expected to arrive there.
 #[derive(Clone, Copy)]
 pub struct Waypoint {
+    /// Map position of this waystation.
     pub position: Vector3,
+    /// Scheduled arrival time at this waystation (seconds since journey start).
     pub arrival_time: f64,
 }
 
-/// An ordered sequence of waypoints describing a planned path.
+/// Village role: a traveller's itinerary filed with the village roads guild —
+/// an ordered sequence of waystations together with the total propulsive cost
+/// (Δv) accumulated along the entire journey.
 pub struct Route {
+    /// Ordered list of waystations from departure to destination.
     pub waypoints: Vec<Waypoint>,
+    /// Cumulative Δv consumed by the journey so far (m/s).
     pub total_delta_v: f64,
 }
 
 impl Route {
+    /// Village role: open a new blank itinerary at the roads guild counter.
     pub fn new() -> Self {
         Route {
             waypoints: Vec::new(),
@@ -21,15 +30,21 @@ impl Route {
         }
     }
 
+    /// Village role: stamp a new waystation into the itinerary and add the
+    /// leg's Δv cost to the running journey total.
     pub fn push(&mut self, waypoint: Waypoint, delta_v: f64) {
         self.waypoints.push(waypoint);
         self.total_delta_v += delta_v;
     }
 
+    /// Village role: report how many waystations are currently logged in
+    /// this itinerary.
     pub fn len(&self) -> usize {
         self.waypoints.len()
     }
 
+    /// Village role: confirm whether the itinerary is still blank (no
+    /// waystations logged yet).
     pub fn is_empty(&self) -> bool {
         self.waypoints.is_empty()
     }
@@ -41,18 +56,24 @@ impl Default for Route {
     }
 }
 
-/// Selects and sequences trajectories to form an efficient route.
+/// Village role: the roads guild's master route-planner — holds every
+/// approved trajectory leg and uses them to find efficient paths between
+/// any two points on the village map.
 pub struct Router {
+    /// All trajectory legs available for route construction.
     pub trajectories: Vec<Trajectory>,
 }
 
 impl Router {
+    /// Village role: charter a new route-planner with a given set of
+    /// approved trajectory legs.
     pub fn new(trajectories: Vec<Trajectory>) -> Self {
         Router { trajectories }
     }
 
-    /// Returns the trajectory with the lowest delta-v that departs from
-    /// a position within `tolerance` of `origin`.
+    /// Village role: the thrifty traveller's query — returns the single
+    /// cheapest (lowest Δv) trajectory leg that departs from a position
+    /// within `tolerance` of `origin`, or `None` if no such leg exists.
     pub fn cheapest_from(&self, origin: Vector3, tolerance: f64) -> Option<&Trajectory> {
         self.trajectories
             .iter()
@@ -60,9 +81,10 @@ impl Router {
             .min_by(|a, b| a.delta_v.partial_cmp(&b.delta_v).unwrap())
     }
 
-    /// Greedily builds a route from `start` to `goal`, chaining trajectories
-    /// whose origins lie within `tolerance` of the previous destination.
-    /// Returns `None` if no path reaches the goal within `max_hops` steps.
+    /// Village role: the guild scribe's greedy path-finding ritual — chains
+    /// trajectory legs from `start` toward `goal`, always picking the leg
+    /// whose destination is closest to the goal.  Returns the completed
+    /// [`Route`] itinerary, or `None` if no path is found within `max_hops`.
     pub fn plan(
         &self,
         start: Vector3,
@@ -112,6 +134,8 @@ impl Router {
     }
 }
 
+/// Village role: the cartographer's distance formula — computes the straight-line
+/// distance between two points on the village map (Euclidean norm in 3-D).
 fn distance(a: Vector3, b: Vector3) -> f64 {
     let dx = a.x - b.x;
     let dy = a.y - b.y;
