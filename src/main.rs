@@ -1,3 +1,27 @@
+//! # THE VILLAGE LEDGER — SINALOA MAP
+//!
+//! Entry filed bottom-left → top-right (bottom row first, crown last):
+//!
+//! ```text
+//!                         '-._                    _.-'
+//!                       '.       🐎🌱🐸🪺🐸           🌱🐸🪺🐸       .'🛸🏟️👽🛸👽
+//!                    \    🌶️🦩        🪢🦋🌮 🦋🪢        🦓🐆     /
+//!                    \                                  /
+//!                    ;                                      ;
+//!                    |      🌴🦩        🪷🏟️        🐘🐎🌆         |
+//!                    |                                      |
+//!                    |   🦎🦀🎺       💃🏽   🛸🏟️👽🛸👽   🕺🏽      🎶      |
+//!                    |                    🦩                  |
+//!                    |      🐟🦩        👛🐻🦁🚤        🐚🦍         |
+//!                    ;                                      ;
+//!                    /   🐳🌺🐸        🪷🪨🌷🌹        🌴🥭  🌴       \🛸🏟️👽🛸👽
+//!                    /                                  \
+//!                      .'     mar, sierra y sol      '.
+//!                        .-'   S I N A L O A      '-.
+//!                           .-~~~~~~~~~~~~~~~~~-.
+//! 🛸🏟️👽🛸👽      🌱 🌴 🌱      🛸🏟️👽🛸👽                             🌱  🌴🌱
+//! ```
+
 /// Village role: the localization quarter — watchtowers, spheres, and the Angel encounter.
 pub mod localization;
 /// Village role: the roads quarter — waypoints, routes, and the route-planner guild.
