@@ -1,4 +1,5 @@
 pub mod routing;
+pub mod zebra;
 
 #[derive(Clone, Copy)]
 pub struct Vector3 {
@@ -38,6 +39,7 @@ pub struct BiomeEntities {
     pub flora_health: Vec<f32>,
     pub fauna_stamina: Vec<f32>,
     pub deep_space_signals: Vec<f64>,
+    pub zebras: zebra::ZebraHerd,
 }
 
 pub struct ScholarAthlete {
