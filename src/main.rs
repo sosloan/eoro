@@ -1,7 +1,8 @@
+pub mod localization;
 pub mod routing;
 pub mod zebra;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct Vector3 {
     pub x: f64,
     pub y: f64,
