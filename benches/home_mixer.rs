@@ -56,7 +56,11 @@ fn main() {
     let ids = (1..=1_200).map(ContentId).collect::<Vec<_>>();
     let hydration_started = Instant::now();
     for _ in 0..ITERATIONS {
-        black_box(adapter.hydrate(black_box(&ids)).expect("benchmark hydration"));
+        black_box(
+            adapter
+                .hydrate(black_box(&ids))
+                .expect("benchmark hydration"),
+        );
     }
     let hydration = hydration_started.elapsed();
 
