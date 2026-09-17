@@ -93,7 +93,9 @@ impl HomeMixerConfig {
             self.weights.quality,
             self.weights.freshness,
         ];
-        if weights.iter().any(|weight| !weight.is_finite() || *weight < 0.0)
+        if weights
+            .iter()
+            .any(|weight| !weight.is_finite() || *weight < 0.0)
             || weights.iter().sum::<f64>() <= 0.0
         {
             return Err(MixerError::new(

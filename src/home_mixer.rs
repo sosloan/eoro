@@ -82,12 +82,9 @@ impl HomeMixer {
         let before_dedup = candidates.len();
         let mut seen = BTreeSet::new();
         candidates.retain(|candidate| seen.insert(candidate.id));
-        diagnostics.duplicate_count = before_dedup - candidates.len();
-        timer.finish(
-            &mut diagnostics,
-            candidates.len(),
-            diagnostics.duplicate_count,
-        );
+        let duplicate_count = before_dedup - candidates.len();
+        diagnostics.duplicate_count = duplicate_count;
+        timer.finish(&mut diagnostics, candidates.len(), duplicate_count);
 
         let timer = StageTimer::start("eligibility_safety", candidates.len());
         let before_filter = candidates.len();
@@ -111,12 +108,9 @@ impl HomeMixer {
                 Err(error) if self.config.thunder_policy == SourcePolicy::Required => {
                     return Err(error);
                 }
-                Err(error) => record_partial_failure(
-                    &self.thunder,
-                    error,
-                    &mut diagnostics,
-                    &mut warnings,
-                ),
+                Err(error) => {
+                    record_partial_failure(&self.thunder, error, &mut diagnostics, &mut warnings)
+                }
             }
         }
         timer.finish(&mut diagnostics, candidates.len(), 0);
@@ -226,7 +220,9 @@ impl HomeMixer {
             request.limit = self.config.max_request_results;
         }
         request.excluded_ids.truncate(self.config.max_candidates);
-        request.recently_served_ids.truncate(self.config.max_candidates);
+        request
+            .recently_served_ids
+            .truncate(self.config.max_candidates);
         Ok(request)
     }
 
@@ -292,8 +288,7 @@ impl HomeMixer {
             .freshness_secs
             .unwrap_or_else(|| request.now_secs.saturating_sub(candidate.created_at_secs));
         candidate.features.freshness_secs = Some(age);
-        let freshness =
-            2.0_f64.powf(-(age as f64) / self.config.freshness_half_life_secs as f64);
+        let freshness = 2.0_f64.powf(-(age as f64) / self.config.freshness_half_life_secs as f64);
 
         let raw_and_weights = [
             ("relevance", relevance, self.config.weights.relevance),
@@ -326,17 +321,16 @@ impl HomeMixer {
         }
     }
 
-    fn apply_diversity(
-        &self,
-        scored: Vec<ScoredCandidate>,
-        limit: usize,
-    ) -> Vec<ScoredCandidate> {
+    fn apply_diversity(&self, scored: Vec<ScoredCandidate>, limit: usize) -> Vec<ScoredCandidate> {
         let mut authors = BTreeMap::<u64, usize>::new();
         let mut categories = BTreeMap::<String, usize>::new();
         let mut selected = Vec::new();
 
         for candidate in scored {
-            let author_count = authors.get(&candidate.candidate.author_id).copied().unwrap_or(0);
+            let author_count = authors
+                .get(&candidate.candidate.author_id)
+                .copied()
+                .unwrap_or(0);
             if author_count >= self.config.max_per_author {
                 continue;
             }
@@ -362,10 +356,7 @@ impl HomeMixer {
     }
 }
 
-fn merge_features(
-    candidates: &mut [Candidate],
-    features: BTreeMap<ContentId, CandidateFeatures>,
-) {
+fn merge_features(candidates: &mut [Candidate], features: BTreeMap<ContentId, CandidateFeatures>) {
     for candidate in candidates {
         if let Some(hydrated) = features.get(&candidate.id) {
             candidate.features = hydrated.clone();
@@ -597,7 +588,10 @@ mod tests {
         let mixer = mixer_with(vec![], vec![candidate(7, 1, 0.5, "base")], |_| {});
         let response = mixer.mix(request(2)).unwrap();
         assert!(response.diagnostics.fallback_used);
-        assert_eq!(response.results[0].candidate.source, CandidateSource::Baseline);
+        assert_eq!(
+            response.results[0].candidate.source,
+            CandidateSource::Baseline
+        );
     }
 
     #[test]
@@ -646,8 +640,10 @@ mod tests {
 
     #[test]
     fn records_timeout_as_partial_failure_and_uses_fallback() {
-        let mut config = HomeMixerConfig::default();
-        config.source_timeout_ms = 1;
+        let config = HomeMixerConfig {
+            source_timeout_ms: 1,
+            ..HomeMixerConfig::default()
+        };
         let adapter = ThunderAdapter::initialize(
             Arc::new(
                 InMemoryThunder::new("slow-thunder", vec![candidate(1, 1, 1.0, "a")])
@@ -658,8 +654,7 @@ mod tests {
             config.max_candidates,
         )
         .unwrap();
-        let mixer =
-            HomeMixer::new(config, adapter, vec![candidate(2, 2, 0.5, "base")]).unwrap();
+        let mixer = HomeMixer::new(config, adapter, vec![candidate(2, 2, 0.5, "base")]).unwrap();
 
         let response = mixer.mix(request(1)).unwrap();
         assert!(response.diagnostics.fallback_used);
@@ -675,8 +670,7 @@ mod tests {
         };
         let adapter = ThunderAdapter::initialize(
             Arc::new(
-                InMemoryThunder::new("slow-thunder", vec![])
-                    .with_delay(Duration::from_millis(50)),
+                InMemoryThunder::new("slow-thunder", vec![]).with_delay(Duration::from_millis(50)),
             ),
             CandidateSource::Thunder,
             Duration::from_millis(1),
@@ -712,5 +706,23 @@ mod tests {
         let response = mixer.mix(request(1)).unwrap();
         assert!(response.results.is_empty());
         assert!(response.diagnostics.empty_feed);
+    }
+
+    #[test]
+    fn checked_in_fixture_runs_end_to_end() {
+        let fixture: MixerFixture =
+            serde_json::from_str(include_str!("../fixtures/home_mixer.json")).unwrap();
+        let mixer = mixer_with(fixture.candidates, fixture.fallback_candidates, |_| {});
+
+        let response = mixer.mix(fixture.request).unwrap();
+        assert_eq!(
+            response
+                .results
+                .iter()
+                .map(|result| result.candidate.id.0)
+                .collect::<Vec<_>>(),
+            vec![101, 102]
+        );
+        assert_eq!(response.diagnostics.duplicate_count, 1);
     }
 }

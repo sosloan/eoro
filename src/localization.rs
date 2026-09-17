@@ -164,7 +164,14 @@ impl EncounterSolver {
         }
 
         let rms = if n > 0.0 { (sum_sq / n).sqrt() } else { 0.0 };
-        (Vector3 { x: gx, y: gy, z: gz }, rms)
+        (
+            Vector3 {
+                x: gx,
+                y: gy,
+                z: gz,
+            },
+            rms,
+        )
     }
 }
 

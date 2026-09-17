@@ -103,8 +103,7 @@ fn stable_id(value: &str) -> u64 {
 mod tests {
     use super::*;
     use crate::{
-        BiomeEntities, CollaborationSystems, MissionArchitecture, ScholarAthlete,
-        zebra::ZebraHerd,
+        BiomeEntities, CollaborationSystems, MissionArchitecture, ScholarAthlete, zebra::ZebraHerd,
     };
 
     #[test]

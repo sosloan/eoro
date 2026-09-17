@@ -231,7 +231,12 @@ impl CandidateBackend for InMemoryThunder {
         }
         Ok(ids
             .iter()
-            .filter_map(|id| self.features.get(id).cloned().map(|features| (*id, features)))
+            .filter_map(|id| {
+                self.features
+                    .get(id)
+                    .cloned()
+                    .map(|features| (*id, features))
+            })
             .collect())
     }
 }
@@ -266,10 +271,7 @@ mod tests {
     #[test]
     fn adapter_enforces_timeout() {
         let adapter = ThunderAdapter::initialize(
-            Arc::new(
-                InMemoryThunder::new("slow", vec![])
-                    .with_delay(Duration::from_millis(50)),
-            ),
+            Arc::new(InMemoryThunder::new("slow", vec![]).with_delay(Duration::from_millis(50))),
             CandidateSource::Thunder,
             Duration::from_millis(1),
             10,
