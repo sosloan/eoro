@@ -3,4 +3,17 @@ name = "eoro"
 version = "0.1.0"
 edition = "2024"
 
+[features]
+default = ["home-mixer"]
+home-mixer = []
+thunder-upstream = []
+
 [dependencies]
+serde = { version = "=1.0.229", features = ["derive"] }
+serde_json = "=1.0.151"
+
+[package.metadata.eoro.upstream.thunder]
+repository = "https://github.com/xai-org/x-algorithm.git"
+revision = "fad2f71edc780ab14e4cfaebbb8b221385782e43"
+path = "thunder"
+integration = "protocol-adapter"
