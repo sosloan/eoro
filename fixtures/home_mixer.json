@@ -1,0 +1,105 @@
+{
+  "request": {
+    "user_id": 42,
+    "session_id": "fixture-session",
+    "request_id": "fixture-request",
+    "excluded_ids": [104],
+    "recently_served_ids": [105],
+    "limit": 3,
+    "now_secs": 200
+  },
+  "candidates": [
+    {
+      "id": 101,
+      "author_id": 11,
+      "source": "fixture",
+      "created_at_secs": 190,
+      "eligible": true,
+      "safe": true,
+      "features": {
+        "relevance": 0.9,
+        "engagement": 0.7,
+        "quality": 0.8,
+        "freshness_secs": 10,
+        "category": "science"
+      }
+    },
+    {
+      "id": 102,
+      "author_id": 12,
+      "source": "fixture",
+      "created_at_secs": 180,
+      "eligible": true,
+      "safe": true,
+      "features": {
+        "relevance": 0.8,
+        "engagement": 0.9,
+        "quality": 0.7,
+        "freshness_secs": 20,
+        "category": "games"
+      }
+    },
+    {
+      "id": 101,
+      "author_id": 11,
+      "source": "fixture",
+      "created_at_secs": 190,
+      "eligible": true,
+      "safe": true,
+      "features": {
+        "relevance": 0.9,
+        "engagement": 0.7,
+        "quality": 0.8,
+        "freshness_secs": 10,
+        "category": "science"
+      }
+    },
+    {
+      "id": 103,
+      "author_id": 13,
+      "source": "fixture",
+      "created_at_secs": 170,
+      "eligible": false,
+      "safe": true,
+      "features": {
+        "relevance": 1.0,
+        "engagement": 1.0,
+        "quality": 1.0,
+        "freshness_secs": 30,
+        "category": "news"
+      }
+    },
+    {
+      "id": 104,
+      "author_id": 14,
+      "source": "fixture",
+      "created_at_secs": 160,
+      "eligible": true,
+      "safe": true,
+      "features": {
+        "relevance": 1.0,
+        "engagement": 1.0,
+        "quality": 1.0,
+        "freshness_secs": 40,
+        "category": "news"
+      }
+    }
+  ],
+  "fallback_candidates": [
+    {
+      "id": 201,
+      "author_id": 21,
+      "source": "baseline",
+      "created_at_secs": 100,
+      "eligible": true,
+      "safe": true,
+      "features": {
+        "relevance": 0.5,
+        "engagement": 0.5,
+        "quality": 0.5,
+        "freshness_secs": 100,
+        "category": "baseline"
+      }
+    }
+  ]
+}
